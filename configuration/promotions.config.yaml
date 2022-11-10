@@ -1,0 +1,7 @@
+HOST: "localhost"
+PORT: "1321"
+
+DB:
+  DIALECT: "postgres"
+  URL: ""
+  NAME: ""
