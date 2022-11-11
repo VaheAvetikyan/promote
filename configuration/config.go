@@ -10,9 +10,13 @@ type Constants struct {
 	HOST string
 	PORT string
 	DB   struct {
-		DIALECT string
-		URL     string
-		NAME    string
+		DIALECT  string
+		URL      string
+		NAME     string
+		USER     string
+		PASSWORD string
+		HOST     string
+		PORT     string
 	}
 }
 
@@ -26,10 +30,6 @@ func initViper() (*Constants, error) {
 	viper.SetDefault("HOST", "localhost")
 	viper.SetDefault("PORT", "1321")
 	viper.SetDefault("DB.DIALECT", "postgres")
-
-	for _, k := range viper.AllKeys() {
-		log.Println(k, ": ", viper.GetStringSlice(k))
-	}
 
 	var constants Constants
 	err = viper.Unmarshal(&constants)

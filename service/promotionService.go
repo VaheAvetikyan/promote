@@ -5,16 +5,16 @@ import (
 	"example/promote/repository"
 )
 
-func GetRecord(id int) model.Promotion {
+func GetPromotion(id int) model.Promotion {
 	promotion := repository.GetById(id)
 	return promotion
 }
 
-func GetRecords() []*model.Promotion {
+func GetPromotions() []*model.Promotion {
 	promotions := repository.GetAll()
 	return promotions
 }
 
-func AddRecord(promotion model.Promotion) {
+func AddPromotion(promotion model.Promotion) {
 	repository.Add(promotion)
 }

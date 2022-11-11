@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"example/promote/configuration"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -14,11 +15,13 @@ type Database struct {
 }
 
 func NewConnection() *Database {
-	configuration, err := configuration.New()
+	c, err := configuration.New()
 	if err != nil {
 		log.Panic("Configuration Error", err)
 	}
-	db, err := sql.Open(configuration.DB.DIALECT, "postgres://user:pass@localhost/bookstore")
+	connectionDetails := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable",
+		c.DB.USER, c.DB.PASSWORD, c.DB.NAME, c.DB.HOST, c.DB.PORT)
+	db, err := sql.Open(c.DB.DIALECT, connectionDetails)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,28 +30,26 @@ func NewConnection() *Database {
 	return database
 }
 
-func (database *Database) SelectAll(table string) *sql.Rows {
-	rows, err := database.DB.Query("SELECT * FROM " + table)
+func (database *Database) SelectAll(statement string) *sql.Rows {
+	rows, err := database.DB.Query(statement)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer rows.Close()
 	return rows
 }
 
-func (database *Database) Select(table string, id int) *sql.Row {
-	statement := "SELECT * FROM " + table + "WHERE ID = $1"
-	row := database.DB.QueryRow(statement, table, strconv.Itoa(id))
+func (database *Database) Select(statement string, id int) *sql.Row {
+	row := database.DB.QueryRow(statement, strconv.Itoa(id))
 	return row
 }
 
-func (database *Database) Insert(table string, id string, price float32, date string) {
+func (database *Database) Insert(statement string, id string, price float32, date string) {
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer tx.Rollback()
-	stmt, err := tx.Prepare("INSERT INTO " + table + "VALUES ($1, $2, $3)")
+	stmt, err := tx.Prepare(statement)
 	if err != nil {
 		log.Fatal(err)
 	}

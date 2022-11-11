@@ -11,16 +11,19 @@ import (
 func Routes() *gin.Engine {
 	router := gin.Default()
 	router.GET("/promotions", handler.GetRecords)
-	router.GET("/promotions/:id", handler.GetRecordById)
-	router.POST("/promotions", handler.AddRecord)
+	router.GET("/promotions/:id", handler.GetPromotionById)
+	router.POST("/promotions", handler.AddPromotion)
 	return router
 }
 
 func main() {
-	configuration, err := configuration.New()
+	config, err := configuration.New()
 	if err != nil {
 		log.Panic("Configuration Error", err)
 	}
 	router := Routes()
-	router.Run(configuration.HOST + ":" + configuration.PORT)
+	err = router.Run(config.HOST + ":" + config.PORT)
+	if err != nil {
+		return
+	}
 }
