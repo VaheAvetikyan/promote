@@ -13,6 +13,11 @@ func Routes() *gin.Engine {
 	router.GET("/promotions", handler.GetRecords)
 	router.GET("/promotions/:id", handler.GetPromotionById)
 	router.POST("/promotions", handler.AddPromotion)
+
+	//curl -X POST http://localhost:1321/promotions/upload \
+	//  -F "file=@/<filepath>" \
+	//  -H "Content-Type: multipart/form-data"
+	router.POST("/promotions/upload", handler.UploadPromotions)
 	return router
 }
 
@@ -24,6 +29,6 @@ func main() {
 	router := Routes()
 	err = router.Run(config.HOST + ":" + config.PORT)
 	if err != nil {
-		return
+		log.Fatal("Could not initialize Server.")
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -61,5 +62,23 @@ func (database *Database) Insert(statement string, id string, price float32, dat
 	err = tx.Commit()
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func (database *Database) BatchInsert(table string, placeholders []string, values []interface{}) {
+	txn, err := database.DB.Begin()
+	if err != nil {
+		log.Fatal("Could not start a new transaction. ", err)
+	}
+
+	insertStatement := fmt.Sprintf("INSERT INTO %s VALUES %s", table, strings.Join(placeholders, ","))
+	_, err = txn.Exec(insertStatement, values...)
+	if err != nil {
+		txn.Rollback()
+		log.Fatal("Failed to insert multiple records at once.", err)
+	}
+
+	if err := txn.Commit(); err != nil {
+		log.Fatal("Failed to commit transaction.", err)
 	}
 }
