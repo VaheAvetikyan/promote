@@ -16,7 +16,7 @@ var (
 	promotionService = service.NewPromotionService()
 )
 
-func GetRecords(context *gin.Context) {
+func GetPromotion(context *gin.Context) {
 	offset, exists := context.GetQuery("offset")
 	if !exists {
 		offset = "0"

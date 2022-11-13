@@ -10,13 +10,11 @@ import (
 
 func Routes() *gin.Engine {
 	router := gin.Default()
-	router.GET("/promotions", handler.GetRecords)
+	router.GET("/promotions", handler.GetPromotion)
 	router.GET("/promotions/:id", handler.GetPromotionById)
 	router.POST("/promotions", handler.AddPromotion)
 
-	//curl -X POST http://localhost:1321/promotions/upload \
-	//  -F "file=@/<filepath>" \
-	//  -H "Content-Type: multipart/form-data"
+	//curl -X POST http://localhost:1321/promotions/upload -F "file=@/<filepath>" -H "Content-Type: multipart/form-data"
 	router.POST("/promotions/upload", handler.UploadPromotions)
 	return router
 }
