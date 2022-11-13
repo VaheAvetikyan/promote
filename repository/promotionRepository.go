@@ -74,7 +74,7 @@ func GetById(id int) model.Promotion {
 	return promotion
 }
 
-func GetAll(offset any, limit any) []*model.Promotion {
+func GetAll(offset string, limit string) []*model.Promotion {
 	promotions := make([]*model.Promotion, 0)
 	conn := getConnection()
 	statement := fmt.Sprintf("SELECT * FROM %s LIMIT %s OFFSET %s", TABLE, limit, offset)

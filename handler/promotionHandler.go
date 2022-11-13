@@ -5,12 +5,15 @@ import (
 	"example/promote/model"
 	"example/promote/service"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
+)
 
-	"github.com/gin-gonic/gin"
+var (
+	promotionService = service.NewPromotionService()
 )
 
 func GetRecords(context *gin.Context) {
@@ -22,7 +25,7 @@ func GetRecords(context *gin.Context) {
 	if !exists {
 		limit = "100"
 	}
-	context.IndentedJSON(http.StatusOK, service.GetPromotions(offset, limit))
+	context.IndentedJSON(http.StatusOK, promotionService.GetPromotions(offset, limit))
 }
 
 func GetPromotionById(context *gin.Context) {
@@ -34,7 +37,7 @@ func GetPromotionById(context *gin.Context) {
 		})
 		log.Fatal("Provided id is invalid. ", err)
 	}
-	promotion := service.GetPromotion(id)
+	promotion := promotionService.GetPromotion(id)
 	if promotion == (model.Promotion{}) {
 		context.IndentedJSON(http.StatusNotFound, fmt.Sprintf("Record not found with id: %s", identifier))
 	} else {
@@ -51,21 +54,20 @@ func AddPromotion(context *gin.Context) {
 		})
 		log.Fatal("Provided data is not valid. ", err)
 	}
-	service.AddPromotion(promotion)
+	promotionService.AddPromotion(promotion)
 	context.IndentedJSON(http.StatusOK, "Added Successfully.")
 }
 
 func UploadPromotions(context *gin.Context) {
 	fileHeader, err := context.FormFile("file")
 	if err != nil {
-		log.Print("Error getting the fileHeader. ", err)
+		log.Print("Error getting the File Header. ", err)
 		return
 	}
-	log.Printf("Uploaded file Header name: %+v\n", fileHeader.Filename)
-	log.Printf("Uploaded file Header size: %+v bytes\n", fileHeader.Size)
-	log.Printf("File mime type: %+v\n", fileHeader.Header)
+	log.Printf("Uploaded file name: %+v\n", fileHeader.Filename)
+	log.Printf("Uploaded file size: %+v bytes\n", fileHeader.Size)
 
-	service.DropTable()
+	promotionService.DropTable()
 
 	file, err := fileHeader.Open()
 	defer file.Close()
@@ -74,12 +76,11 @@ func UploadPromotions(context *gin.Context) {
 	for i := 0; ; i++ {
 		csvLine, err := reader.Read()
 		if i%100 == 0 && i != 0 {
-			service.AddPromotions(rows)
+			promotionService.AddPromotions(rows)
 			rows = make([]*model.Promotion, 0)
 		}
-		// Stop at EOF.
-		if err == io.EOF {
-			service.AddPromotions(rows)
+		if err == io.EOF { // Stop at EOF.
+			promotionService.AddPromotions(rows)
 			rows = nil
 			break
 		}
