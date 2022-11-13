@@ -9,3 +9,7 @@ DB:
   PASSWORD: "goodkat1453"
   HOST: "localhost"
   PORT: "5432"
+  PROPERTIES:
+    MaxOpenConnections: 50
+    MaxIdleConnections: 10
+    ConnMaxIdleTime: 100

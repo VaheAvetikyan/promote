@@ -10,13 +10,18 @@ type Constants struct {
 	HOST string
 	PORT string
 	DB   struct {
-		DIALECT  string
-		URL      string
-		NAME     string
-		USER     string
-		PASSWORD string
-		HOST     string
-		PORT     string
+		DIALECT    string
+		URL        string
+		NAME       string
+		USER       string
+		PASSWORD   string
+		HOST       string
+		PORT       string
+		PROPERTIES struct {
+			MaxOpenConnections int
+			MaxIdleConnections int
+			ConnMaxIdleTime    int
+		}
 	}
 }
 

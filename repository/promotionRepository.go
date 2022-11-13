@@ -15,7 +15,7 @@ func getConnection() *Database {
 		return conn
 	}
 	conn = NewConnection()
-	createStatement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (identifier integer generated always as identity, id char(50), price real, expirationDate char(50))", TABLE)
+	createStatement := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (identifier integer generated always as identity, id varchar(50), price decimal, expirationDate varchar(50))", TABLE)
 	_, err := conn.DB.Exec(createStatement)
 	if err != nil {
 		log.Fatal(err)

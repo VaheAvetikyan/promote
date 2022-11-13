@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"example/promote/configuration"
 	"fmt"
+	_ "github.com/lib/pq"
 	"log"
 	"strconv"
 	"strings"
-
-	_ "github.com/lib/pq"
+	"time"
 )
 
 type Database struct {
@@ -26,6 +26,10 @@ func NewConnection() *Database {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.SetMaxOpenConns(c.DB.PROPERTIES.MaxOpenConnections)
+	db.SetMaxIdleConns(c.DB.PROPERTIES.MaxIdleConnections)
+	db.SetConnMaxIdleTime(time.Duration(c.DB.PROPERTIES.ConnMaxIdleTime))
+
 	database := &Database{}
 	database.DB = db
 	return database
@@ -44,7 +48,7 @@ func (database *Database) Select(statement string, id int) *sql.Row {
 	return row
 }
 
-func (database *Database) Insert(statement string, id string, price float32, date string) {
+func (database *Database) Insert(statement string, id string, price float64, date string) {
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -66,19 +70,30 @@ func (database *Database) Insert(statement string, id string, price float32, dat
 }
 
 func (database *Database) BatchInsert(table string, placeholders []string, values []interface{}) {
-	txn, err := database.DB.Begin()
-	if err != nil {
-		log.Fatal("Could not start a new transaction. ", err)
-	}
+	go func() {
+		txn, err := database.DB.Begin()
+		if err != nil {
+			log.Fatal("Could not start a new transaction. ", err)
+		}
 
-	insertStatement := fmt.Sprintf("INSERT INTO %s VALUES %s", table, strings.Join(placeholders, ","))
-	_, err = txn.Exec(insertStatement, values...)
-	if err != nil {
-		txn.Rollback()
-		log.Fatal("Failed to insert multiple records at once.", err)
-	}
+		insertStatement := fmt.Sprintf("INSERT INTO %s VALUES %s", table, strings.Join(placeholders, ","))
+		stmt, err := txn.Prepare(insertStatement)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	if err := txn.Commit(); err != nil {
-		log.Fatal("Failed to commit transaction.", err)
-	}
+		_, err = stmt.Exec(values...)
+		if err != nil {
+			txn.Rollback()
+			log.Fatal("Failed to insert multiple records at once.", err)
+		}
+
+		if err := txn.Commit(); err != nil {
+			log.Fatal("Failed to commit transaction.", err)
+		}
+
+		if err = stmt.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 }

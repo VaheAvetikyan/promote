@@ -87,10 +87,10 @@ func UploadPromotions(context *gin.Context) {
 		if err != nil {
 			log.Panic(err)
 		}
-		price, _ := strconv.ParseFloat(csvLine[1], 32)
+		price, _ := strconv.ParseFloat(csvLine[1], 0)
 		rows = append(rows, &model.Promotion{
 			Id:             csvLine[0],
-			Price:          float32(price),
+			Price:          price,
 			ExpirationDate: csvLine[2],
 		})
 	}
