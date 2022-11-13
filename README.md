@@ -16,10 +16,8 @@ curl http://localhost:1321/promotions/1
 Perform the following steps:
 1. Download and install [Golang](https://golang.org/).
 1. Install Postgres database [PostgreSQL](https://www.postgresql.org/).
-1. Get the source code of this repository by the following command.
-    ```bash
-    go install github.com/VaheAvetikyan/promote@latest
-    ```
+1. Get the source code of this repository.
+
 ## Configuration
 There are 2 methods for configuration file:
 1. You can modify default file in the project path configuration/promotions.config.yaml
