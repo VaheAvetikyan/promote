@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -26,8 +27,17 @@ type Constants struct {
 }
 
 func initViper() (*Constants, error) {
-	viper.SetConfigName("promotions.config")
-	viper.AddConfigPath("./configuration")
+	ConfigName := os.Getenv("CONFIG_FILE_NAME")
+	ConfigPath := os.Getenv("CONFIG_FILE_PATH")
+	if ConfigName == "" {
+		ConfigName = "promotions.config"
+	}
+	if ConfigPath == "" {
+		ConfigPath = "./configuration"
+	}
+
+	viper.SetConfigName(ConfigName)
+	viper.AddConfigPath(ConfigPath)
 	err := viper.ReadInConfig()
 	if err != nil {
 		return &Constants{}, err
